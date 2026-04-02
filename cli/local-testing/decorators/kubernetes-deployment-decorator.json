@@ -1,0 +1,29 @@
+{
+    "$schema": "../../../calm/draft/2026-03/standards/deployment/deployment.decorator.standard.json",
+    "unique-id": "deploy-k8s-001",
+    "type": "deployment",
+    "target-type": [
+        "architecture"
+    ],
+    "target": [
+        "https://calm.finos.org/draft/2026-03/samples/api-gateway/api-gateway.architecture.json"
+    ],
+    "applies-to": [
+        "api-gateway",
+        "user-service",
+        "order-service"
+    ],
+    "data": {
+        "start-time": "2026-03-31T10:00:00Z",
+        "end-time": "2026-03-31T10:08:00Z",
+        "status": "completed",
+        "deployment-details": "https://argo.example.com/applications/api-gateway",
+        "notes": "Kubernetes rolling deployment via ArgoCD",
+        "platform": "kubernetes",
+        "cluster": "prod-eu-west-1",
+        "namespace": "api-services",
+        "image-tag": "v2.1.0",
+        "replicas": 3,
+        "strategy": "RollingUpdate"
+    }
+}

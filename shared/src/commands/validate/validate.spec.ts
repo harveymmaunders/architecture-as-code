@@ -1,4 +1,4 @@
-import { validate, sortSpectralIssueBySeverity, convertJsonSchemaIssuesToValidationOutputs, convertSpectralDiagnosticToValidationOutputs, stripRefs, exitBasedOffOfValidationOutcome, extractChoicesFromArchitecture } from './validate';
+import { validate, validateDecorator, sortSpectralIssueBySeverity, convertJsonSchemaIssuesToValidationOutputs, convertSpectralDiagnosticToValidationOutputs, stripRefs, exitBasedOffOfValidationOutcome, extractChoicesFromArchitecture, CALM_DECORATOR_SCHEMA_REF } from './validate';
 import { ISpectralDiagnostic } from '@stoplight/spectral-core';
 import { ValidationOutcome, ValidationOutput } from './validation.output';
 import { ErrorObject } from 'ajv';
@@ -790,3 +790,72 @@ function buildISpectralDiagnostic(code: string, message: string, severity: numbe
         range: { start: { line: 1, character: 1 }, end: { line: 2, character: 1 } }
     };
 }
+
+describe('validateDecorator', () => {
+    let schemaDir: SchemaDirectory;
+
+    const validDecorator = {
+        'unique-id': 'finos-architecture-1-deployment',
+        'type': 'deployment',
+        'target': ['/calm/namespaces/finos/architectures/1/versions/1-0-0'],
+        'applies-to': ['example-node'],
+        'data': { 'status': 'completed' }
+    };
+
+    beforeEach(() => {
+        schemaDir = { getSchema: vi.fn(), getAllSchemas: vi.fn() } as unknown as SchemaDirectory;
+    });
+
+    it('should return no errors when decorator is valid', async () => {
+        mocks.jsonSchemaValidate.mockReturnValue([]);
+
+        const outcome = await validateDecorator(validDecorator, schemaDir, false);
+
+        expect(outcome.hasErrors).toBe(false);
+        expect(outcome.jsonSchemaValidationOutputs).toHaveLength(0);
+        expect(mocks.jsonSchemaValidatorConstructor).toHaveBeenCalledWith(
+            schemaDir,
+            { '$ref': CALM_DECORATOR_SCHEMA_REF },
+            false
+        );
+    });
+
+    it('should return errors when decorator fails schema validation', async () => {
+        const schemaError = {
+            instancePath: '/type',
+            schemaPath: '#/defs/decorator/properties/type',
+            keyword: 'type',
+            params: {},
+            message: 'must be string'
+        };
+        mocks.jsonSchemaValidate.mockReturnValue([schemaError]);
+
+        const outcome = await validateDecorator({ 'type': 123 }, schemaDir, false);
+
+        expect(outcome.hasErrors).toBe(true);
+        expect(outcome.jsonSchemaValidationOutputs).toHaveLength(1);
+        expect(outcome.jsonSchemaValidationOutputs[0].source).toBe('decorator');
+        expect(outcome.jsonSchemaValidationOutputs[0].path).toBe('/type');
+    });
+
+    it('should return an error when the validator fails to initialise', async () => {
+        mocks.jsonSchemaValidatorConstructor.mockImplementationOnce(() => ({
+            initialize: vi.fn().mockRejectedValue(new Error('Schema not found')),
+            validate: mocks.jsonSchemaValidate
+        }));
+
+        const outcome = await validateDecorator(validDecorator, schemaDir, false);
+
+        expect(outcome.hasErrors).toBe(true);
+        expect(outcome.jsonSchemaValidationOutputs[0].message).toContain('Schema not found');
+        expect(outcome.jsonSchemaValidationOutputs[0].source).toBe('decorator');
+    });
+
+    it('should return empty spectral outputs (decorator validation is schema-only)', async () => {
+        mocks.jsonSchemaValidate.mockReturnValue([]);
+
+        const outcome = await validateDecorator(validDecorator, schemaDir, false);
+
+        expect(outcome.spectralSchemaValidationOutputs).toHaveLength(0);
+    });
+});
