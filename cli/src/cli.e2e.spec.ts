@@ -323,7 +323,7 @@ describe('CLI Integration Tests', () => {
     test('validate command fails when neither architecture nor pattern is provided', async () => {
         await expect(run(calm(), ['validate'])).rejects.toMatchObject({
             stderr: expect.stringContaining(
-                'error: one of the required options \'-p, --pattern <file>\', \'-a, --architecture <file>\' or \'--timeline <file>\' was not specified'
+                'error: one of the required options \'-p, --pattern <file>\', \'-a, --architecture <file>\', \'--timeline <file>\' or \'-d, --decorator <file>\' was not specified'
             )
         });
     });
