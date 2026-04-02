@@ -60,7 +60,7 @@ This decorator has two problems that the base decorator schema catches:
 calm validate -d local-testing/decorators/deployment-decorator-errors.json --format pretty
 ```
 
-**Expected output:** validation fails with two schema errors pointing to the `data` object.
+**Expected output:** validation fails with two schema errors at the root level.
 
 ---
 
