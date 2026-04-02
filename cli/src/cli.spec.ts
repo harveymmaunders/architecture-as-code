@@ -93,6 +93,18 @@ describe('CLI Commands', () => {
                 architecturePath: 'arch.json',
             }));
         });
+
+        it('should call runValidate with decoratorPath when --decorator is provided', async () => {
+            await program.parseAsync([
+                'node', 'cli.js', 'validate',
+                '-d', 'decorator.json',
+            ]);
+
+            expect(validateModule.checkValidateOptions).toHaveBeenCalled();
+            expect(validateModule.runValidate).toHaveBeenCalledWith(expect.objectContaining({
+                decoratorPath: 'decorator.json',
+            }));
+        });
     });
 
     describe('Template Command', () => {

@@ -16,6 +16,8 @@ import { selectChoices, CalmChoice } from '../generate/components/options.js';
 
 let logger: Logger; // defined later at startup
 
+export const CALM_DECORATOR_SCHEMA_REF = 'https://calm.finos.org/draft/2026-03/meta/decorators.json#/defs/decorator';
+
 export type ValidateOutputFormat = 'json' | 'junit' | 'pretty';
 
 export interface ValidationDocumentContext {
@@ -269,6 +271,42 @@ async function validateTimeline(timeline: object, schema: object, schemaDirector
     }
 
     return new ValidationOutcome(jsonSchemaValidations, spectralValidationResults.spectralIssues, errors, warnings);
+}
+
+/**
+ * Validate a decorator document against the CALM decorator meta-schema.
+ *
+ * @param decorator - The decorator as a JS object.
+ * @param schemaDirectory - SchemaDirectory instance for schema resolution.
+ * @param debug - Whether to log at debug level.
+ * @returns Validation report.
+ */
+export async function validateDecorator(decorator: object, schemaDirectory: SchemaDirectory, debug: boolean = false): Promise<ValidationOutcome> {
+    logger = initLogger(debug, 'calm-validate');
+    logger.debug('Validating decorator against CALM decorator schema');
+
+    // Synthetic schema: AJV resolves the $ref via the SchemaDirectory loadSchema callback
+    const decoratorSchema = { '$ref': CALM_DECORATOR_SCHEMA_REF };
+
+    let jsonSchemaErrors: ValidationOutput[] = [];
+    let errors = false;
+
+    try {
+        const validator = new JsonSchemaValidator(schemaDirectory, decoratorSchema, debug);
+        await validator.initialize();
+        const schemaErrors = validator.validate(decorator);
+        if (schemaErrors.length > 0) {
+            errors = true;
+            jsonSchemaErrors = convertJsonSchemaIssuesToValidationOutputs(schemaErrors, 'decorator');
+        }
+    } catch (error) {
+        errors = true;
+        jsonSchemaErrors = [
+            new ValidationOutput('json-schema', 'error', toErrorMessage(error), '/', undefined, undefined, undefined, undefined, undefined, 'decorator')
+        ];
+    }
+
+    return new ValidationOutcome(jsonSchemaErrors, [], errors, false);
 }
 
 /**
