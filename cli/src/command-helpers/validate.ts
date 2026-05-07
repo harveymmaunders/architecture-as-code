@@ -1,4 +1,4 @@
-import { getFormattedOutput, validate, exitBasedOffOfValidationOutcome, ValidationFormattingOptions, loadArchitectureAndPattern, loadTimeline, enrichWithDocumentPositions, ParsedDocumentContext, initLogger, ValidateOutputFormat, buildDocumentLoader, DocumentLoader, Logger } from '@finos/calm-shared';
+import { getFormattedOutput, validate, validateDecorator, exitBasedOffOfValidationOutcome, ValidationFormattingOptions, loadArchitectureAndPattern, loadTimeline, enrichWithDocumentPositions, ParsedDocumentContext, initLogger, ValidateOutputFormat, buildDocumentLoader, DocumentLoader, Logger } from '@finos/calm-shared';
 import path from 'path';
 import { mkdirp } from 'mkdirp';
 import { readFileSync, writeFileSync } from 'fs';
@@ -10,6 +10,7 @@ export interface ValidateOptions {
     patternPath?: string;
     architecturePath?: string;
     timelinePath?: string;
+    decoratorPath?: string;
     metaSchemaPath: string;
     calmHubUrl?: string;
     urlToLocalFileMapping?: string;
@@ -33,8 +34,12 @@ export async function runValidate(options: ValidateOptions) {
         let architecture: object | undefined = undefined;
         let pattern: object | undefined = undefined;
         let timeline: object | undefined = undefined;
+        let decorator: object | undefined = undefined;
 
-        if (options.timelinePath) {
+        if (options.decoratorPath) {
+            decorator = await docLoader.loadMissingDocument(options.decoratorPath, 'decorator');
+            logger.debug(`Loaded decorator from ${options.decoratorPath}`);
+        } else if (options.timelinePath) {
             const result = await loadTimeline(
                 options.timelinePath,
                 docLoader,
@@ -56,10 +61,12 @@ export async function runValidate(options: ValidateOptions) {
             pattern = result.pattern;
         }
         const documentContexts = buildDocumentContexts(options, logger);
-        if (!architecture && !pattern && !timeline) {
-            throw new Error('You must provide an architecture, a pattern, or a timeline');
+        if (!architecture && !pattern && !timeline && !decorator) {
+            throw new Error('You must provide an architecture, a pattern, a timeline, or a decorator');
         }
-        const outcome = await validate(architecture, pattern, timeline, schemaDirectory, options.verbose);
+        const outcome = decorator
+            ? await validateDecorator(decorator, schemaDirectory, options.verbose)
+            : await validate(architecture, pattern, timeline, schemaDirectory, options.verbose);
         enrichWithDocumentPositions(outcome, documentContexts);
         const content = getFormattedOutput(outcome, options.outputFormat, toFormattingOptions(documentContexts));
         writeOutputFile(options.outputPath, content);
@@ -88,12 +95,15 @@ export function writeOutputFile(output: string, validationsOutput: string) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function checkValidateOptions(program: Command, options: any, patternOption: string, architectureOption: string, timelineOption: string) {
+export function checkValidateOptions(program: Command, options: any, patternOption: string, architectureOption: string, timelineOption: string, decoratorOption: string) {
     if (options.timeline && (options.pattern || options.architecture)) {
         program.error(`error: the option '${timelineOption}' cannot be used with either of the options '${patternOption}' or '${architectureOption}'`);
     }
-    if (!options.pattern && !options.architecture && !options.timeline) {
-        program.error(`error: one of the required options '${patternOption}', '${architectureOption}' or '${timelineOption}' was not specified`);
+    if (options.decorator && (options.pattern || options.architecture || options.timeline)) {
+        program.error(`error: the option '${decoratorOption}' cannot be used with '${patternOption}', '${architectureOption}' or '${timelineOption}'`);
+    }
+    if (!options.pattern && !options.architecture && !options.timeline && !options.decorator) {
+        program.error(`error: one of the required options '${patternOption}', '${architectureOption}', '${timelineOption}' or '${decoratorOption}' was not specified`);
     }
 }
 

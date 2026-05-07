@@ -1,9 +1,11 @@
 export {
     validate,
+    validateDecorator,
     formatOutput as getFormattedOutput,
     exitBasedOffOfValidationOutcome,
     ValidationFormattingOptions,
     ValidationDocumentContext,
+    CALM_DECORATOR_SCHEMA_REF,
 } from './commands/validate/validate.js';
 export { OutputFormat, ValidateOutputFormat } from './commands/validate/validate.js';
 export { runGenerate } from './commands/generate/generate.js';

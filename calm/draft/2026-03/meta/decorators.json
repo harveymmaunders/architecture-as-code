@@ -7,6 +7,10 @@
         "decorator": {
             "type": "object",
             "properties": {
+                "$schema": {
+                    "type": "string",
+                    "description": "URI reference to the schema this decorator conforms to"
+                },
                 "unique-id": {
                     "type": "string",
                     "description": "Unique identifier for this decorator"

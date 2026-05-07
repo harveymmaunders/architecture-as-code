@@ -1,0 +1,22 @@
+{
+    "$schema": "../../../calm/draft/2026-03/standards/deployment/deployment.decorator.standard.json",
+    "unique-id": "deploy-001",
+    "type": "deployment",
+    "target-type": [
+        "architecture"
+    ],
+    "target": [
+        "https://calm.finos.org/draft/2026-03/samples/api-gateway/api-gateway.architecture.json"
+    ],
+    "applies-to": [
+        "api-gateway",
+        "user-service"
+    ],
+    "data": {
+        "start-time": "2026-03-31T09:00:00Z",
+        "end-time": "2026-03-31T09:15:00Z",
+        "status": "completed",
+        "deployment-details": "https://grafana.example.com/dashboards/deploy-001",
+        "notes": "Production deployment of v2.1.0"
+    }
+}

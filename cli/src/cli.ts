@@ -20,6 +20,7 @@ const CALMHUB_URL_OPTION = '-c, --calm-hub-url <url>';
 // Validate command options
 const FORMAT_OPTION = '-f, --format <format>';
 const STRICT_OPTION = '--strict';
+const DECORATOR_OPTION = '-d, --decorator <file>';
 
 // Template and Docify command options
 const BUNDLE_OPTION = '-b, --bundle <path>';
@@ -70,10 +71,12 @@ Validation requires:
   - an architecture:             to validate against CALM schema
   - an architecture and pattern: to validate the architecture against the CALM pattern
   - a pattern:                   to validate the pattern against CALM schema
-  - a timeline:                  to validate the timeline against CALM timeline schema`)
+  - a timeline:                  to validate the timeline against CALM timeline schema
+  - a decorator:                 to validate the decorator against CALM decorator schema`)
         .option(PATTERN_OPTION, 'Path to the pattern file to use. May be a file path or a URL.')
         .option(ARCHITECTURE_OPTION, 'Path to the architecture file to use. May be a file path or a URL.')
         .option(TIMELINE_OPTION, 'Path to the timeline file to validate. May be a file path or a URL.')
+        .option(DECORATOR_OPTION, 'Path to the decorator file to validate. May be a file path or a URL.')
         .option(SCHEMAS_OPTION, 'Path to the directory containing the meta schemas to use.', CALM_META_SCHEMA_DIRECTORY)
         .option(CALMHUB_URL_OPTION, 'URL to CALMHub instance')
         .option(URL_MAPPING_OPTION, 'Path to mapping file which maps URLs to local paths')
@@ -87,11 +90,12 @@ Validation requires:
         .option(VERBOSE_OPTION, 'Enable verbose logging.', false)
         .action(async (options) => {
             const { checkValidateOptions, runValidate } = await import('./command-helpers/validate');
-            checkValidateOptions(program, options, PATTERN_OPTION, ARCHITECTURE_OPTION, TIMELINE_OPTION);
+            checkValidateOptions(program, options, PATTERN_OPTION, ARCHITECTURE_OPTION, TIMELINE_OPTION, DECORATOR_OPTION);
             await runValidate({
                 architecturePath: options.architecture,
                 patternPath: options.pattern,
                 timelinePath: options.timeline,
+                decoratorPath: options.decorator,
                 metaSchemaPath: options.schemaDirectory,
                 calmHubUrl: options.calmHubUrl,
                 urlToLocalFileMapping: options.urlToLocalFileMapping,
