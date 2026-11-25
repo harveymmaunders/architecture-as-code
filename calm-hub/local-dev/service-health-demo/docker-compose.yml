@@ -1,0 +1,219 @@
+# Service health demo: CALM Hub, seven mock services, Prometheus, Tempo, Grafana and the service-health extension.
+# The mock services send traces (OTLP/HTTP) to Tempo. The flow driver runs every CALM flow as real calls between them.
+#
+# Before the first start, from the repository root:
+#   npm ci && ./mvnw -B -pl calm-hub -am package -DskipTests
+# This builds the Hub jar and UI, and the meta-schemas in calm-hub/target/calm-schemas that MongoDB seeds.
+#
+# WARNING: Hub runs the no-auth profile. Local demo only.
+
+name: calm-service-health
+
+x-traced: &traced
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
+  ARCHITECTURE_DIR: /architecture
+  GRAFANA_URL: http://localhost:3000
+
+x-mock-service: &mock-service
+  image: calm-service-health/mock-service:latest
+  build: ./mock-service
+  restart: unless-stopped
+  volumes:
+    - ./architecture:/architecture:ro
+  networks: [demo-net]
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ../../mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ../../target/calm-schemas/release:/calm-schemas/release:ro
+      - ../../mongo/controls:/controls:ro
+    environment:
+      - CALM_RELEASE_SCHEMA_PATH=/calm-schemas/release
+      - CALM_CONTROLS_BASE_PATH=/controls
+    networks: [demo-net]
+
+  # Makes the key that Hub signs extension identity assertions with, once. Local demo only.
+  calm-hub-keys:
+    image: node:26-alpine
+    network_mode: none
+    volumes:
+      - calm-hub-keys:/keys
+    command:
+      - node
+      - -e
+      - |
+        const fs = require('node:fs');
+        if (!fs.existsSync('/keys/hub-private.pem')) {
+          const { publicKey, privateKey } = require('node:crypto').generateKeyPairSync('ec', { namedCurve: 'P-256' });
+          fs.writeFileSync('/keys/hub-public.pem', publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o644 });
+          fs.writeFileSync('/keys/hub-private.pem', privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o644 });
+        }
+
+  # Built from source: the demo needs the newest extension points (decorator views, forms).
+  calmhub:
+    image: calm-hub:service-health-demo
+    build:
+      context: ../..
+      dockerfile: src/main/docker/Dockerfile.jvm
+    ports:
+      - "8080:8080"
+    environment:
+      - >-
+        JAVA_OPTS=-Dquarkus.http.host=0.0.0.0
+        -Dquarkus.mongodb.connection-string=mongodb://mongodb:27017 -Dquarkus.profile=no-auth
+        -Dcalm.extensions.dir=/extensions
+        -Dcalm.extensions.service-health.backend-url=http://service-health:8095
+        -Dcalm.extensions.service-health.allow-http=true
+        -Dcalm.hub.base-url=http://localhost:8080
+        -Dcalm.extensions.identity.private-key-location=/keys/hub-private.pem
+        -Dcalm.extensions.identity.public-key-locations=/keys/hub-public.pem
+        -Dcalm.extensions.allow-without-auth=true
+    volumes:
+      - ./extensions:/extensions:ro
+      - calm-hub-keys:/keys:ro
+    depends_on:
+      mongodb:
+        condition: service_started
+      calm-hub-keys:
+        condition: service_completed_successfully
+    networks:
+      demo-net:
+        aliases: [hub]
+
+  customer-portal:
+    <<: *mock-service
+    environment:
+      <<: *traced
+      SERVICE_NAME: customer-portal
+    ports: ["9101:8080"]
+  admin-console:
+    <<: *mock-service
+    environment:
+      <<: *traced
+      SERVICE_NAME: admin-console
+    ports: ["9102:8080"]
+  api-gateway:
+    <<: *mock-service
+    environment:
+      <<: *traced
+      SERVICE_NAME: api-gateway
+    ports: ["9103:8080"]
+  auth-service:
+    <<: *mock-service
+    environment:
+      <<: *traced
+      SERVICE_NAME: auth-service
+    ports: ["9104:8080"]
+  orders-api:
+    <<: *mock-service
+    environment:
+      <<: *traced
+      SERVICE_NAME: orders-api
+    ports: ["9105:8080"]
+  payments-api:
+    <<: *mock-service
+    environment:
+      <<: *traced
+      SERVICE_NAME: payments-api
+    ports: ["9106:8080"]
+  central-db:
+    <<: *mock-service
+    environment:
+      <<: *traced
+      SERVICE_NAME: central-db
+    ports: ["9107:8080"]
+
+  # Runs each flow every FLOW_INTERVAL_MS. A burst: scripts/generate-traces.sh.
+  flow-driver:
+    image: calm-service-health/mock-service:latest
+    build: ./mock-service
+    restart: unless-stopped
+    command: ["node", "flow-driver.mjs"]
+    healthcheck:
+      disable: true
+    environment:
+      <<: *traced
+      FLOW_INTERVAL_MS: "15000"
+    volumes:
+      - ./architecture:/architecture:ro
+    depends_on: [tempo, customer-portal, admin-console, api-gateway, auth-service, orders-api, payments-api, central-db]
+    networks: [demo-net]
+
+  tempo:
+    image: grafana/tempo:3.0.0
+    command: ["-config.file=/etc/tempo.yaml"]
+    # The image user cannot write to a new named volume.
+    user: "0"
+    ports:
+      - "3200:3200"
+    volumes:
+      - ./grafana/tempo/tempo.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    networks: [demo-net]
+
+  # The remote-write receiver takes the service-graph and span metrics of the Tempo metrics generator.
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-remote-write-receiver
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks: [demo-net]
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/etc/grafana/provisioning/dashboards/service-health.json
+      # Explore (the trace links) is closed to Viewers unless they may edit. Provisioned dashboards stay read-only.
+      - GF_USERS_VIEWERS_CAN_EDIT=true
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on: [prometheus, tempo]
+    networks: [demo-net]
+
+  # Not published to the host: only Hub calls it, and it checks Hub's identity assertion on each call.
+  service-health:
+    image: calm-service-health/extension-service:latest
+    build: ./extension-service
+    restart: unless-stopped
+    environment:
+      - PROMETHEUS_URL=http://prometheus:9090
+      - CALM_HUB_URL=http://hub:8080
+      # The issuer that Hub signs with: calm.hub.base-url.
+      - CALM_HUB_ISSUER=http://localhost:8080
+      - TEMPO_URL=http://tempo:3200
+      # Browser-facing Grafana origin: dashboard, service and trace links.
+      - GRAFANA_URL=http://localhost:3000
+      - HEALTH_NAMESPACES=service-health-demo
+      - PUBLISH_DECORATORS=true
+      - PUBLISH_INTERVAL_MS=5000
+      # A node must stay down this long before an incident opens: a restart opens none.
+      - INCIDENT_MIN_DOWN_MS=15000
+      - WARN_ERROR_RATIO=0.05
+      - WARN_P95_MS=500
+      - WARN_TRACE_ERROR_RATIO=0.05
+      - MIN_TRACES=5
+    depends_on: [prometheus, tempo]
+    networks: [demo-net]
+
+volumes:
+  calm-hub-keys:
+  prometheus-data:
+  tempo-data:
+
+networks:
+  demo-net:
+    driver: bridge

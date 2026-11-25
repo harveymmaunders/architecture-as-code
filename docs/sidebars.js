@@ -103,7 +103,7 @@ const sidebars = {
       type: 'category',
       label: 'Extensions',
       collapsed: false,
-      items: ['extensions/c4', 'extensions/ea-layers'],
+      items: ['extensions/c4', 'extensions/ea-layers', 'extensions/service-health'],
     },
   ],
 

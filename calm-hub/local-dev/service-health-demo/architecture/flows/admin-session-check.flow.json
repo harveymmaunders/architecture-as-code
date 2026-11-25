@@ -1,0 +1,17 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-session-check/versions/1.1.0",
+  "unique-id": "flow-admin-session-check",
+  "name": "Admin Session Check",
+  "description": "The admin console checks that the staff session is still valid. The auth service holds sessions in memory.",
+  "transitions": [
+    {
+      "relationship-unique-id": "admin-console-to-auth-service",
+      "sequence-number": 1,
+      "description": "Admin console asks the auth service to introspect the session token"
+    }
+  ],
+  "metadata": {
+    "criticality": "normal"
+  }
+}

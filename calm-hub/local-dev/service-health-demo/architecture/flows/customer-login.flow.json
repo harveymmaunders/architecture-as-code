@@ -1,0 +1,27 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/customer-login/versions/1.1.0",
+  "unique-id": "flow-customer-login",
+  "name": "Customer Login",
+  "description": "A customer signs in to the portal with a username and password.",
+  "transitions": [
+    {
+      "relationship-unique-id": "customer-portal-to-api-gateway",
+      "sequence-number": 1,
+      "description": "Portal sends the credentials to the gateway"
+    },
+    {
+      "relationship-unique-id": "api-gateway-to-auth-service",
+      "sequence-number": 2,
+      "description": "Gateway asks the auth service to authenticate the customer"
+    },
+    {
+      "relationship-unique-id": "auth-service-to-central-db",
+      "sequence-number": 3,
+      "description": "Auth service checks the credentials and stores the session"
+    }
+  ],
+  "metadata": {
+    "criticality": "critical"
+  }
+}

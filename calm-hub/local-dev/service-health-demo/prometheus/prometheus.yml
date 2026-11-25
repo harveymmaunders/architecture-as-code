@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+# One job per service: the job label is the CALM node unique-id.
+scrape_configs:
+  - job_name: customer-portal
+    static_configs:
+      - targets: ['customer-portal:8080']
+  - job_name: admin-console
+    static_configs:
+      - targets: ['admin-console:8080']
+  - job_name: api-gateway
+    static_configs:
+      - targets: ['api-gateway:8080']
+  - job_name: auth-service
+    static_configs:
+      - targets: ['auth-service:8080']
+  - job_name: orders-api
+    static_configs:
+      - targets: ['orders-api:8080']
+  - job_name: payments-api
+    static_configs:
+      - targets: ['payments-api:8080']
+  - job_name: central-db
+    static_configs:
+      - targets: ['central-db:8080']

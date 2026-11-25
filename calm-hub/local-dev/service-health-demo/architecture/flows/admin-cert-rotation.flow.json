@@ -1,0 +1,22 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-cert-rotation/versions/1.1.0",
+  "unique-id": "flow-admin-cert-rotation",
+  "name": "Admin Certificate Rotation",
+  "description": "A staff member rotates the mTLS certificates of the services.",
+  "transitions": [
+    {
+      "relationship-unique-id": "admin-console-to-auth-service",
+      "sequence-number": 1,
+      "description": "Admin console asks the auth service to issue new certificates"
+    },
+    {
+      "relationship-unique-id": "auth-service-to-central-db",
+      "sequence-number": 2,
+      "description": "Auth service stores the new certificates and revokes the old ones"
+    }
+  ],
+  "metadata": {
+    "criticality": "normal"
+  }
+}
