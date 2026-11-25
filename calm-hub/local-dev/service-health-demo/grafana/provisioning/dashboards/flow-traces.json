@@ -1,0 +1,208 @@
+{
+  "uid": "flow-traces",
+  "title": "Flow traces",
+  "tags": [
+    "calm",
+    "service-health-demo",
+    "traces"
+  ],
+  "timezone": "browser",
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "links": [
+    {
+      "title": "Service health",
+      "type": "link",
+      "url": "/d/service-health/service-health",
+      "icon": "dashboard"
+    }
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Failed flow runs per flow (per minute)",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 60,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum by (calm_flow_unique_id) (increase(traces_spanmetrics_calls_total{span_name=~\"flow .*\", status_code=\"STATUS_CODE_ERROR\"}[$__interval]))",
+          "legendFormat": "{{calm_flow_unique_id}}"
+        }
+      ],
+      "interval": "1m",
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": [
+            "sum"
+          ],
+          "sortBy": "Total",
+          "sortDesc": true
+        }
+      }
+    },
+    {
+      "id": 2,
+      "type": "table",
+      "title": "Edge error ratio (service graph, 5m)",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.01
+              },
+              {
+                "color": "red",
+                "value": 0.2
+              }
+            ]
+          },
+          "custom": {
+            "cellOptions": {
+              "type": "color-background"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "sortBy": [
+          {
+            "displayName": "Value",
+            "desc": true
+          }
+        ]
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        }
+      ],
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "format": "table",
+          "instant": true,
+          "expr": "clamp_max((sum by (client, server) (increase(traces_service_graph_request_failed_total[5m])) or sum by (client, server) (increase(traces_service_graph_request_total[5m])) * 0) / sum by (client, server) (increase(traces_service_graph_request_total[5m])), 1)"
+        }
+      ],
+      "description": "Failed / all requests per client → server pair. Counters that start inside the window can overstate the ratio, so it is capped at 100%."
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Failed flow traces",
+      "description": "Root spans of failed flow runs. Click a trace id to open it.",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "traceql",
+          "limit": 50,
+          "tableType": "traces",
+          "query": "{ span.\"calm.flow.slug\" != \"\" && status = error } | select(span.\"calm.flow.slug\", span.\"calm.flow.failed-step\", span.\"calm.flow.failed-relationship\", span.\"calm.flow.failed-node\", span.\"calm.flow.failure-reason\")"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "nodeGraph",
+      "title": "Service graph (from traces)",
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 24,
+        "h": 14
+      },
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "queryType": "serviceMap"
+        }
+      ]
+    }
+  ]
+}

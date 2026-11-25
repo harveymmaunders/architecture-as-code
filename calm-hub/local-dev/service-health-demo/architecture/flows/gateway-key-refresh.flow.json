@@ -1,0 +1,17 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/gateway-key-refresh/versions/1.1.0",
+  "unique-id": "flow-gateway-key-refresh",
+  "name": "Gateway Key Refresh",
+  "description": "The gateway fetches the token signing keys (JWKS) from the auth service. The keys are held in memory.",
+  "transitions": [
+    {
+      "relationship-unique-id": "api-gateway-to-auth-service",
+      "sequence-number": 1,
+      "description": "Gateway fetches the current signing keys"
+    }
+  ],
+  "metadata": {
+    "criticality": "high"
+  }
+}

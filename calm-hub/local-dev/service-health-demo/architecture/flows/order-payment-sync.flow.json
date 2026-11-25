@@ -1,0 +1,32 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/order-payment-sync/versions/1.1.0",
+  "unique-id": "flow-order-payment-sync",
+  "name": "Order Payment Sync",
+  "description": "A background job in the orders API syncs order status with payment status.",
+  "transitions": [
+    {
+      "relationship-unique-id": "orders-api-to-central-db",
+      "sequence-number": 1,
+      "description": "Orders API reads the orders that wait for payment"
+    },
+    {
+      "relationship-unique-id": "orders-api-to-payments-api",
+      "sequence-number": 2,
+      "description": "Orders API asks the payments API for the payment status"
+    },
+    {
+      "relationship-unique-id": "payments-api-to-central-db",
+      "sequence-number": 3,
+      "description": "Payments API reads the payment status"
+    },
+    {
+      "relationship-unique-id": "orders-api-to-central-db",
+      "sequence-number": 4,
+      "description": "Orders API updates the order status"
+    }
+  ],
+  "metadata": {
+    "criticality": "critical"
+  }
+}

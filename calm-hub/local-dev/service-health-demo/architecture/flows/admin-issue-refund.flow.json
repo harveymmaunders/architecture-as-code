@@ -1,0 +1,32 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-issue-refund/versions/1.1.0",
+  "unique-id": "flow-admin-issue-refund",
+  "name": "Admin Issue Refund",
+  "description": "A staff member approves and issues a refund.",
+  "transitions": [
+    {
+      "relationship-unique-id": "admin-console-to-api-gateway",
+      "sequence-number": 1,
+      "description": "Admin console sends the refund approval"
+    },
+    {
+      "relationship-unique-id": "api-gateway-to-auth-service",
+      "sequence-number": 2,
+      "description": "Gateway validates the staff token"
+    },
+    {
+      "relationship-unique-id": "api-gateway-to-payments-api",
+      "sequence-number": 3,
+      "description": "Gateway routes the refund to the payments API"
+    },
+    {
+      "relationship-unique-id": "payments-api-to-central-db",
+      "sequence-number": 4,
+      "description": "Payments API stores the refund"
+    }
+  ],
+  "metadata": {
+    "criticality": "high"
+  }
+}

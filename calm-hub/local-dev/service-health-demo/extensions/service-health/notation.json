@@ -1,0 +1,207 @@
+{
+  "shapes": {
+    "Node": {
+      "viewBox": [
+        0,
+        0,
+        220,
+        56
+      ],
+      "resize": {
+        "mode": "stretch"
+      },
+      "minSize": [
+        220,
+        56
+      ],
+      "parts": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 220,
+            "height": 56,
+            "rx": 8,
+            "ry": 8
+          },
+          "fill": "background",
+          "stroke": "stroke"
+        }
+      ],
+      "slots": {
+        "icon": {
+          "x": 12,
+          "y": 15,
+          "width": 22,
+          "height": 22
+        },
+        "label": {
+          "x": 44,
+          "y": 9,
+          "width": 168,
+          "height": 20,
+          "align": "start",
+          "weight": "bold"
+        },
+        "metadata": {
+          "x": 44,
+          "y": 29,
+          "width": 168,
+          "height": 15,
+          "align": "start",
+          "size": "small"
+        },
+        "description": {
+          "x": 12,
+          "y": 46,
+          "width": 200,
+          "height": 8,
+          "align": "start",
+          "size": "small",
+          "grow": true
+        }
+      },
+      "ports": "outline"
+    }
+  },
+  "styles": {
+    "elements": [
+      {
+        "tag": "WebClient",
+        "shape": "Node",
+        "label": "Web client",
+        "background": "#ffffff",
+        "color": "#1e293b",
+        "stroke": "#0891b2",
+        "strokeWidth": 1,
+        "border": "solid",
+        "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDg5MWIyIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48cGF0aCBkPSJNMjEuNTQgMTVIMTdhMiAyIDAgMCAwLTIgMnY0LjU0Ii8+PHBhdGggZD0iTTcgMy4zNFY1YTMgMyAwIDAgMCAzIDNhMiAyIDAgMCAxIDIgMmMwIDEuMS45IDIgMiAyYTIgMiAwIDAgMCAyLTJjMC0xLjEuOS0yIDItMmgzLjE3Ii8+PHBhdGggZD0iTTExIDIxLjk1VjE4YTIgMiAwIDAgMC0yLTJhMiAyIDAgMCAxLTItMnYtMWEyIDIgMCAwIDAtMi0ySDIuMDUiLz48L3N2Zz4=",
+        "metadata": true,
+        "description": true,
+        "dark": {
+          "background": "#1e293b",
+          "color": "#f1f5f9",
+          "stroke": "#22d3ee"
+        }
+      },
+      {
+        "tag": "Service",
+        "shape": "Node",
+        "label": "Service",
+        "background": "#ffffff",
+        "color": "#1e293b",
+        "stroke": "#06b6d4",
+        "strokeWidth": 1,
+        "border": "solid",
+        "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDZiNmQ0IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTExIDEwLjI3IDcgMy4zNCIvPjxwYXRoIGQ9Im0xMSAxMy43My00IDYuOTMiLz48cGF0aCBkPSJNMTIgMjJ2LTIiLz48cGF0aCBkPSJNMTIgMnYyIi8+PHBhdGggZD0iTTE0IDEyaDgiLz48cGF0aCBkPSJtMTcgMjAuNjYtMS0xLjczIi8+PHBhdGggZD0ibTE3IDMuMzQtMSAxLjczIi8+PHBhdGggZD0iTTIgMTJoMiIvPjxwYXRoIGQ9Im0yMC42NiAxNy0xLjczLTEiLz48cGF0aCBkPSJtMjAuNjYgNy0xLjczIDEiLz48cGF0aCBkPSJtMy4zNCAxNyAxLjczLTEiLz48cGF0aCBkPSJtMy4zNCA3IDEuNzMgMSIvPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjIiLz48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI4Ii8+PC9zdmc+",
+        "metadata": true,
+        "description": true,
+        "dark": {
+          "background": "#1e293b",
+          "color": "#f1f5f9",
+          "stroke": "#22d3ee"
+        }
+      },
+      {
+        "tag": "Database",
+        "shape": "Node",
+        "label": "Database",
+        "background": "#ffffff",
+        "color": "#1e293b",
+        "stroke": "#10b981",
+        "strokeWidth": 1,
+        "border": "solid",
+        "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTBiOTgxIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PGVsbGlwc2UgY3g9IjEyIiBjeT0iNSIgcng9IjkiIHJ5PSIzIi8+PHBhdGggZD0iTTMgNVYxOUE5IDMgMCAwIDAgMjEgMTlWNSIvPjxwYXRoIGQ9Ik0zIDEyQTkgMyAwIDAgMCAyMSAxMiIvPjwvc3ZnPg==",
+        "metadata": true,
+        "description": true,
+        "dark": {
+          "background": "#1e293b",
+          "color": "#f1f5f9",
+          "stroke": "#34d399"
+        }
+      },
+      {
+        "tag": "Component",
+        "shape": "Node",
+        "label": "Other node",
+        "background": "#ffffff",
+        "color": "#1e293b",
+        "stroke": "#64748b",
+        "strokeWidth": 1,
+        "border": "solid",
+        "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjQ3NDhiIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTIxIDhhMiAyIDAgMCAwLTEtMS43M2wtNy00YTIgMiAwIDAgMC0yIDBsLTcgNEEyIDIgMCAwIDAgMyA4djhhMiAyIDAgMCAwIDEgMS43M2w3IDRhMiAyIDAgMCAwIDIgMGw3LTRBMiAyIDAgMCAwIDIxIDE2WiIvPjxwYXRoIGQ9Im0zLjMgNyA4LjcgNSA4LjctNSIvPjxwYXRoIGQ9Ik0xMiAyMlYxMiIvPjwvc3ZnPg==",
+        "metadata": true,
+        "description": true,
+        "dark": {
+          "background": "#1e293b",
+          "color": "#f1f5f9",
+          "stroke": "#94a3b8"
+        }
+      },
+      {
+        "tag": "Impacted",
+        "label": "⚠ Impacted",
+        "background": "#fffbeb",
+        "color": "#78350f",
+        "stroke": "#d97706",
+        "strokeWidth": 2,
+        "border": "dashed",
+        "dark": {
+          "background": "#422006",
+          "color": "#fef3c7",
+          "stroke": "#fbbf24"
+        }
+      },
+      {
+        "tag": "Failed",
+        "label": "✕ Failed (click to restore)",
+        "background": "#fef2f2",
+        "color": "#7f1d1d",
+        "stroke": "#dc2626",
+        "strokeWidth": 3,
+        "border": "solid",
+        "dark": {
+          "background": "#450a0a",
+          "color": "#fecaca",
+          "stroke": "#f87171"
+        }
+      }
+    ],
+    "relationships": [
+      {
+        "tag": "Connects",
+        "label": "Connects",
+        "color": "#007dff",
+        "thickness": 2,
+        "style": "dashed",
+        "routing": "curved",
+        "end": "arrow",
+        "dark": {
+          "color": "#60a5fa"
+        }
+      },
+      {
+        "tag": "Other",
+        "label": "Other relationship",
+        "color": "#8b5cf6",
+        "thickness": 2,
+        "style": "dashed",
+        "routing": "curved",
+        "end": "arrow",
+        "dark": {
+          "color": "#a78bfa"
+        }
+      },
+      {
+        "tag": "Broken",
+        "label": "✕ Broken",
+        "color": "#dc2626",
+        "thickness": 3,
+        "style": "solid",
+        "dark": {
+          "color": "#f87171"
+        }
+      }
+    ]
+  }
+}

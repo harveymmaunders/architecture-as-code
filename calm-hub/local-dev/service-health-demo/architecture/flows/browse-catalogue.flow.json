@@ -1,0 +1,27 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/browse-catalogue/versions/1.1.0",
+  "unique-id": "flow-browse-catalogue",
+  "name": "Browse Catalogue",
+  "description": "An anonymous customer browses products and stock levels.",
+  "transitions": [
+    {
+      "relationship-unique-id": "customer-portal-to-api-gateway",
+      "sequence-number": 1,
+      "description": "Portal requests the product list"
+    },
+    {
+      "relationship-unique-id": "api-gateway-to-orders-api",
+      "sequence-number": 2,
+      "description": "Gateway routes the request to the orders API"
+    },
+    {
+      "relationship-unique-id": "orders-api-to-central-db",
+      "sequence-number": 3,
+      "description": "Orders API reads products and stock levels"
+    }
+  ],
+  "metadata": {
+    "criticality": "high"
+  }
+}

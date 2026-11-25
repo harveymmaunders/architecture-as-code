@@ -1,0 +1,275 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/calm.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/architectures/service-health/versions/1.1.0",
+  "title": "Service Health Demo",
+  "description": "Seven services of an online shop, used to show service health and flow impact in CALM Hub.",
+  "nodes": [
+    {
+      "unique-id": "customer-portal",
+      "node-type": "webclient",
+      "name": "Customer Portal",
+      "description": "Web application that customers use to sign in, browse, order and pay.",
+      "metadata": {
+        "prometheus-job": "customer-portal",
+        "owner": "team-web",
+        "oncall": "web-oncall@example.com",
+        "runbook": "https://runbooks.example.com/customer-portal",
+        "tier": "tier-1"
+      }
+    },
+    {
+      "unique-id": "admin-console",
+      "node-type": "webclient",
+      "name": "Admin Console",
+      "description": "Web application that staff use to manage users, certificates, orders and refunds.",
+      "metadata": {
+        "prometheus-job": "admin-console",
+        "owner": "team-backoffice",
+        "oncall": "backoffice-oncall@example.com",
+        "runbook": "https://runbooks.example.com/admin-console",
+        "tier": "tier-3"
+      }
+    },
+    {
+      "unique-id": "api-gateway",
+      "node-type": "service",
+      "name": "API Gateway",
+      "description": "Routes UI calls to the back-end APIs and checks access tokens.",
+      "metadata": {
+        "prometheus-job": "api-gateway",
+        "owner": "team-platform",
+        "oncall": "platform-oncall@example.com",
+        "runbook": "https://runbooks.example.com/api-gateway",
+        "tier": "tier-1"
+      }
+    },
+    {
+      "unique-id": "auth-service",
+      "node-type": "service",
+      "name": "Auth Service",
+      "description": "Authenticates users and issues tokens and certificates.",
+      "metadata": {
+        "prometheus-job": "auth-service",
+        "owner": "team-identity",
+        "oncall": "identity-oncall@example.com",
+        "runbook": "https://runbooks.example.com/auth-service",
+        "tier": "tier-1"
+      }
+    },
+    {
+      "unique-id": "orders-api",
+      "node-type": "service",
+      "name": "Orders API",
+      "description": "Creates, changes and reports on customer orders.",
+      "metadata": {
+        "prometheus-job": "orders-api",
+        "owner": "team-orders",
+        "oncall": "orders-oncall@example.com",
+        "runbook": "https://runbooks.example.com/orders-api",
+        "tier": "tier-1"
+      }
+    },
+    {
+      "unique-id": "payments-api",
+      "node-type": "service",
+      "name": "Payments API",
+      "description": "Takes card payments, refunds and settlement records.",
+      "metadata": {
+        "prometheus-job": "payments-api",
+        "owner": "team-payments",
+        "oncall": "payments-oncall@example.com",
+        "runbook": "https://runbooks.example.com/payments-api",
+        "tier": "tier-1"
+      }
+    },
+    {
+      "unique-id": "central-db",
+      "node-type": "database",
+      "name": "Central Database",
+      "description": "Shared database for users, orders and payments.",
+      "metadata": {
+        "prometheus-job": "central-db",
+        "owner": "team-data",
+        "oncall": "dba-oncall@example.com",
+        "runbook": "https://runbooks.example.com/central-db",
+        "tier": "tier-1"
+      }
+    }
+  ],
+  "relationships": [
+    {
+      "unique-id": "customer-portal-to-api-gateway",
+      "description": "Customer UI calls the public API.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "customer-portal"
+          },
+          "destination": {
+            "node": "api-gateway"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "admin-console-to-api-gateway",
+      "description": "Admin UI calls the public API.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "admin-console"
+          },
+          "destination": {
+            "node": "api-gateway"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "admin-console-to-auth-service",
+      "description": "Admin UI calls the auth admin endpoints directly.",
+      "protocol": "HTTPS",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "admin-console"
+          },
+          "destination": {
+            "node": "auth-service"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "api-gateway-to-auth-service",
+      "description": "Gateway authenticates users and validates tokens.",
+      "protocol": "mTLS",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "api-gateway"
+          },
+          "destination": {
+            "node": "auth-service"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "api-gateway-to-orders-api",
+      "description": "Gateway routes order calls.",
+      "protocol": "mTLS",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "api-gateway"
+          },
+          "destination": {
+            "node": "orders-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "api-gateway-to-payments-api",
+      "description": "Gateway routes payment calls.",
+      "protocol": "mTLS",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "api-gateway"
+          },
+          "destination": {
+            "node": "payments-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "orders-api-to-payments-api",
+      "description": "Orders API authorises, captures and voids payments.",
+      "protocol": "mTLS",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "orders-api"
+          },
+          "destination": {
+            "node": "payments-api"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "orders-api-to-central-db",
+      "description": "Orders API reads and writes orders.",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "orders-api"
+          },
+          "destination": {
+            "node": "central-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "payments-api-to-central-db",
+      "description": "Payments API reads and writes payments.",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "payments-api"
+          },
+          "destination": {
+            "node": "central-db"
+          }
+        }
+      }
+    },
+    {
+      "unique-id": "auth-service-to-central-db",
+      "description": "Auth service reads and writes users, sessions and certificates.",
+      "protocol": "JDBC",
+      "relationship-type": {
+        "connects": {
+          "source": {
+            "node": "auth-service"
+          },
+          "destination": {
+            "node": "central-db"
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "flows": [
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/customer-login/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/customer-token-refresh/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/browse-catalogue/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/place-order/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/pay-for-order/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/view-order-history/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/order-status-polling/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/cancel-order/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/request-refund/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/manage-saved-cards/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/download-invoice/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-login/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-user-management/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-cert-rotation/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-session-check/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-order-search/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-issue-refund/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/payment-reconciliation/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/gateway-key-refresh/versions/1.1.0",
+      "http://localhost:8080/calm/namespaces/service-health-demo/flows/order-payment-sync/versions/1.1.0"
+    ]
+  }
+}

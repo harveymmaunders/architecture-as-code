@@ -1,0 +1,116 @@
+{
+  "id": "service-health",
+  "version": "0.4.0",
+  "hubApi": 0,
+  "name": "Service health",
+  "description": "Live service health from Prometheus and flow errors from Tempo traces: an incident badge on the failing node, the affected flows, and a Failure Simulation lens.",
+  "routes": [
+    {
+      "id": "tab",
+      "method": "GET",
+      "path": "/tab/{namespace}/{resourceType}/{resourceId}",
+      "scope": "read",
+      "readOnly": true
+    },
+    {
+      "id": "flow-status",
+      "method": "GET",
+      "path": "/flow-status/{namespace}/{resourceType}/{resourceId}",
+      "scope": "read",
+      "readOnly": true
+    },
+    {
+      "id": "lens",
+      "method": "GET",
+      "path": "/lens/{namespace}/{resourceType}/{resourceId}",
+      "scope": "read",
+      "readOnly": true
+    },
+    {
+      "id": "screen",
+      "method": "GET",
+      "path": "/screen",
+      "scope": "authenticated",
+      "readOnly": true
+    },
+    {
+      "id": "card",
+      "method": "GET",
+      "path": "/card",
+      "scope": "authenticated",
+      "readOnly": true
+    }
+  ],
+  "contributes": {
+    "screen": [
+      {
+        "id": "flows",
+        "title": "Flow status",
+        "route": "screen"
+      }
+    ],
+    "designer-tab": [
+      {
+        "id": "health",
+        "title": "Overview",
+        "route": "tab"
+      },
+      {
+        "id": "flow-status",
+        "title": "Flow status",
+        "route": "flow-status"
+      }
+    ],
+    "landing-card": [
+      {
+        "id": "health",
+        "title": "Service health",
+        "route": "card"
+      }
+    ],
+    "diagram-lens": [
+      {
+        "id": "simulation",
+        "title": "Failure Simulation",
+        "description": "Click nodes to fail or restore them, and see which flows break. No live data.",
+        "route": "lens",
+        "appliesTo": {
+          "resourceTypes": [
+            "architectures"
+          ]
+        },
+        "params": {
+          "fail": {
+            "pattern": "^(none|[a-z0-9-]+(,[a-z0-9-]+)*)$",
+            "default": "none"
+          }
+        },
+        "notation": "notation.json"
+      }
+    ],
+    "decorator-views": [
+      {
+        "id": "service-health",
+        "match": {
+          "type": "service-health"
+        },
+        "label": "Service health",
+        "overlay": {
+          "status": "/status",
+          "map": {
+            "down": "error",
+            "healthy": "ok"
+          },
+          "default": "info",
+          "hide": [
+            "resolved",
+            "retired"
+          ],
+          "label": "/summary",
+          "time": "/started",
+          "key": "/node"
+        }
+      }
+    ]
+  }
+}

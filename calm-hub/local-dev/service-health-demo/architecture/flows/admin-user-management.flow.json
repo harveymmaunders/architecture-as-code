@@ -1,0 +1,22 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-user-management/versions/1.1.0",
+  "unique-id": "flow-admin-user-management",
+  "name": "Admin User Management",
+  "description": "A staff member creates, locks or deletes a user account.",
+  "transitions": [
+    {
+      "relationship-unique-id": "admin-console-to-auth-service",
+      "sequence-number": 1,
+      "description": "Admin console sends the user change to the auth service"
+    },
+    {
+      "relationship-unique-id": "auth-service-to-central-db",
+      "sequence-number": 2,
+      "description": "Auth service writes the user record"
+    }
+  ],
+  "metadata": {
+    "criticality": "normal"
+  }
+}

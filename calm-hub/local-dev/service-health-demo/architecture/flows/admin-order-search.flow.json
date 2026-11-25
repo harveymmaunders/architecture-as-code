@@ -1,0 +1,32 @@
+{
+  "$schema": "https://calm.finos.org/release/1.3/meta/flow.json",
+  "$id": "http://localhost:8080/calm/namespaces/service-health-demo/flows/admin-order-search/versions/1.1.0",
+  "unique-id": "flow-admin-order-search",
+  "name": "Admin Order Search",
+  "description": "A staff member searches orders for a customer query.",
+  "transitions": [
+    {
+      "relationship-unique-id": "admin-console-to-api-gateway",
+      "sequence-number": 1,
+      "description": "Admin console sends the search"
+    },
+    {
+      "relationship-unique-id": "api-gateway-to-auth-service",
+      "sequence-number": 2,
+      "description": "Gateway validates the staff token"
+    },
+    {
+      "relationship-unique-id": "api-gateway-to-orders-api",
+      "sequence-number": 3,
+      "description": "Gateway routes the search to the orders API"
+    },
+    {
+      "relationship-unique-id": "orders-api-to-central-db",
+      "sequence-number": 4,
+      "description": "Orders API runs the search"
+    }
+  ],
+  "metadata": {
+    "criticality": "normal"
+  }
+}
